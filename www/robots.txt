@@ -1,0 +1,1 @@
+Sitemap: https://api42.ch/sitemap.xml
