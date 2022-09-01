@@ -1,0 +1,39 @@
+name: monitoring
+
+on:
+  push:
+    branches: [ "main" ]
+  workflow_dispatch:
+  schedule:
+    - cron: '55 6 * * 0'
+
+env:
+  DOMAIN: api42.ch
+
+jobs:
+
+  json_lint:
+    runs-on: ubuntu-latest
+    steps:
+      - name: install packages
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y curl jq
+      - name: json lint
+        run: |
+          curl --silent https://${DOMAIN}/ping | jq .
+          curl --silent https://${DOMAIN}/ip | jq .
+          curl --silent https://${DOMAIN}/time | jq .
+          curl --silent https://${DOMAIN}/ping | jq .
+          curl --silent https://${DOMAIN}/latency | jq .
+
+  hsts_preload:
+    runs-on: ubuntu-latest
+    steps:
+      - name: install packages
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y curl grep jq
+      - name: check header
+        run: |
+          curl --head --silent https://${DOMAIN}/ | grep "strict-transport-security: max-age=63072000; includeSubDomains; preload"
